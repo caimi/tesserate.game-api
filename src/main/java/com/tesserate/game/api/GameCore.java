@@ -6,7 +6,7 @@ import com.tesserate.game.api.ui.FullScreenDevice;
 public abstract class GameCore implements Runnable {
 	private long elapsedTime;
 	private long lastTime;
-	private static boolean paused = true;
+	private static boolean paused = false;
 	
 	public abstract void update(long elapsedTime);
 	public abstract void loadResources();

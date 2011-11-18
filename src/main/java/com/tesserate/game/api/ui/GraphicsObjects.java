@@ -44,6 +44,10 @@ public abstract class GraphicsObjects extends JPanel implements Renderable{
 		posicao.setLocation(posicao.x, y);
 	}
 
+	public void addXY(int x, int y) {
+		posicao.setLocation(this.getX()+x, this.getY()+y);
+	}
+	
 	public boolean isVisivel() {
 		return visivel;
 	}
