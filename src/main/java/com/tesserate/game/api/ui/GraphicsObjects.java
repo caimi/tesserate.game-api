@@ -9,16 +9,20 @@ public abstract class GraphicsObjects extends JPanel implements Renderable{
 	
 	private static final long serialVersionUID = 3876125648966630272L;
 	protected Point posicao;
+	protected Point velocidade;
+	
 	public static Graphics2D g;
 	protected boolean visivel;
 	
+	public abstract void render(Graphics2D g);
+
 	public GraphicsObjects() {
 		super();
 		posicao = new Point();
+		velocidade = new Point();
 		this.visivel = true;
 	}
 
-	public abstract void render(Graphics2D g);
 	
 	public Point getPosicao() {
 		return posicao;
@@ -45,7 +49,7 @@ public abstract class GraphicsObjects extends JPanel implements Renderable{
 	}
 
 	public void addXY(int x, int y) {
-		posicao.setLocation(this.getX()+x, this.getY()+y);
+		posicao.translate(x, y);
 	}
 	
 	public boolean isVisivel() {
@@ -54,5 +58,14 @@ public abstract class GraphicsObjects extends JPanel implements Renderable{
 
 	public void setVisivel(boolean visivel) {
 		this.visivel = visivel;
+	}
+	
+	public Point getVelocidade() {
+		return velocidade;
+	}
+
+	public void setVelocidade(int x, int y) {
+		this.velocidade.x = x;
+		this.velocidade.y = y;
 	}
 }
