@@ -50,7 +50,7 @@ public abstract class GameCore implements Runnable {
 				if(!GameCore.paused)
 					update(elapsedTime);
 				render();
-				Thread.sleep(40);
+				Thread.sleep(25);
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
