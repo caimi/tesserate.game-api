@@ -11,7 +11,7 @@ import com.tesserate.game.api.ui.GraphicsObjects;
 public class GraphicText extends GraphicsObjects {
 
 	private static final long serialVersionUID = 1203023930451741329L;
-	protected String msg;
+	protected String msg="";
 	protected FontMetrics fm;
 	protected Font font;
 	protected Color color;
@@ -19,26 +19,27 @@ public class GraphicText extends GraphicsObjects {
 	
 	public GraphicText() {
 		super();
-		color = Color.BLACK;
-		alignment = RIGHT_ALIGNMENT;
+		//color = Color.BLACK;
+		font = new Font("tahoma", Font.PLAIN, 10);
 	}
 
 	public GraphicText(String msg, int x, int y, Font font, Color c) {
 		this.font = font;
 		this.color = c;
 		this.msg = msg;
-		setVisivel(true);
-		posicao.setLocation(x, y);
+		this.setVisible(true);
+		this.setPosition(x, y);
 	}
 	
 	protected void redefineBonds(Graphics g) {
 		fm = g.getFontMetrics(font);
-		int width = fm.stringWidth(this.msg);
+		int width = fm.stringWidth(
+				this.msg);
 		int height = (int)(fm.getHeight() * 0.65);
 		if (alignment == RIGHT_ALIGNMENT){
-			this.setBounds(getX()-width, getY()-height, width, height);
+			this.setBounds(this.getLocation().x-width, this.getLocation().y-height, width, height);
 		}else{
-			this.setBounds(getX(), getY()-height, width, height);
+			this.setBounds(this.getLocation().x, this.getLocation().y-height, width, height);
 		}
 	}
 
@@ -73,14 +74,14 @@ public class GraphicText extends GraphicsObjects {
 
 	@Override
 	public void paint(Graphics g){
-		if (!isVisible()) return; 
-		redefineBonds(g);
+		if (!this.isVisible()) return; 
+		this.redefineBonds(g);
 		g.setFont(font);
 		g.setColor(color);
 		if ( alignment == RIGHT_ALIGNMENT){
-			g.drawString(msg, posicao.getLocation().x-fm.stringWidth(msg), posicao.getLocation().y);
+			g.drawString(msg, this.getLocation().x-fm.stringWidth(msg), this.getLocation().y);
 		}else{
-			g.drawString(msg, posicao.getLocation().x, posicao.getLocation().y);
+			g.drawString(msg, this.getLocation().x, this.getLocation().y);
 		}
 	}
 	

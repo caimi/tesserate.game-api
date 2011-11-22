@@ -5,67 +5,35 @@ import java.awt.Point;
 
 import javax.swing.JPanel;
 
+import com.tesserate.game.api.math.Vector2D;
+
 public abstract class GraphicsObjects extends JPanel implements Renderable{
 	
 	private static final long serialVersionUID = 3876125648966630272L;
-	protected Point posicao;
-	protected Point velocidade;
-	
+	protected Vector2D position;
 	public static Graphics2D g;
-	protected boolean visivel;
 	
 	public abstract void render(Graphics2D g);
 
 	public GraphicsObjects() {
 		super();
-		posicao = new Point();
-		velocidade = new Point();
-		this.visivel = true;
+		position = new Vector2D();
 	}
 
-	
-	public Point getPosicao() {
-		return posicao;
+	@Override
+	public Point getLocation() {
+		return new Point((int)position.getX(), (int)position.getY());
 	}
 
-	public int getX() {
-		return posicao.getLocation().x;
+	public Vector2D getPosition() {
+		return position;
 	}
 
-	public int getY() {
-		return posicao.getLocation().y;
+	public void setPosition(double x, double y) {
+		this.position.setX(x);
+		this.position.setY(y);
 	}
-
-	public void setPosicao(Point p) {
-		this.posicao = p; 
-	}
-
-	public void setX(int x) {
-		posicao.setLocation(x, posicao.y);
-	}
-
-	public void setY(int y) {
-		posicao.setLocation(posicao.x, y);
-	}
-
-	public void addXY(int x, int y) {
-		posicao.translate(x, y);
-	}
-	
-	public boolean isVisivel() {
-		return visivel;
-	}
-
-	public void setVisivel(boolean visivel) {
-		this.visivel = visivel;
-	}
-	
-	public Point getVelocidade() {
-		return velocidade;
-	}
-
-	public void setVelocidade(int x, int y) {
-		this.velocidade.x = x;
-		this.velocidade.y = y;
+	public void setPosition(Vector2D v) {
+		this.setPosition(v.getX(), v.getY());
 	}
 }
