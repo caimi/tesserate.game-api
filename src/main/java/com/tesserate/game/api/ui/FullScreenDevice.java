@@ -19,11 +19,14 @@ public class FullScreenDevice {
 	private BufferStrategy bufferStrategy;
 	private GraphicsDevice device;
 	private ControllerDevice controller;
+	private static int height; 
+	private static int width; 
 	
     private static DisplayMode[] BEST_DISPLAY_MODES = new DisplayMode[] {
+    	new DisplayMode(1280, 800, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
+    	new DisplayMode(1440, 900, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
     	new DisplayMode(800, 600, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
         new DisplayMode(800, 600, 16, DisplayMode.REFRESH_RATE_UNKNOWN),
-        new DisplayMode(1440, 900, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
         new DisplayMode(800, 600, 8, DisplayMode.REFRESH_RATE_UNKNOWN)
     };
     
@@ -63,7 +66,7 @@ public class FullScreenDevice {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(new Color(255,94,55));
-		g.fillRect(0, 0, 800, 600);
+		g.fillRect(0, 0, width, height);
 		SceneGraph.getInstance().render(g);
 		g.dispose();
 		bufferStrategy.show();
@@ -80,6 +83,8 @@ public class FullScreenDevice {
     	DisplayMode best = getBestDisplayMode(device);
     	if (best != null) {
     		device.setDisplayMode(best);
+    		width = best.getWidth();
+    		height = best.getHeight();
     	}
     }
 
@@ -122,5 +127,13 @@ public class FullScreenDevice {
 
 	public void setMainFrame(JFrame mainFrame) {
 		this.mainFrame = mainFrame;
+	}
+
+	public static int getHeight() {
+		return height;
+	}
+
+	public static int getWidth() {
+		return width;
 	}
 }
