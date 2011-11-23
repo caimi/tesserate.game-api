@@ -215,9 +215,14 @@ public class SoundManager extends ThreadPool {
 		return null;
 	}
 
-	public InputStream play(String id) {
+//	public InputStream play(String id) {
+//		Sound sound = ResourceManager.getSound(id);
+//		return play(sound, null, false);
+//	}
+	
+	public static InputStream play (String id){
 		Sound sound = ResourceManager.getSound(id);
-		return play(sound, null, false);
+		return getInstance().play(sound, null, false);
 	}
 	
 	/**
