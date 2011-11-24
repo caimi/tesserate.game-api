@@ -89,14 +89,9 @@ public class FullScreenDevice {
     }
 
     private static DisplayMode getBestDisplayMode(final GraphicsDevice device) {
-    	System.out.println("Available game resolutions:");
-    	final DisplayMode[] modes = device.getDisplayModes();
-    	
-    	for (int i = 0; i < modes.length; i++) {
-    		System.out.println("Available resolution: [w: "+modes[i].getWidth()+" h: "+modes[i].getHeight()+" b:"+modes[i].getBitDepth()+"]");
-    	}
     	
         for (int x = 0; x < BEST_DISPLAY_MODES.length; x++) {
+        	final DisplayMode[] modes = device.getDisplayModes();
             for (int i = 0; i < modes.length; i++) {
                 final boolean widthMatches = modes[i].getWidth() == BEST_DISPLAY_MODES[x].getWidth();
 				final boolean heightMatches = modes[i].getHeight() == BEST_DISPLAY_MODES[x].getHeight();
@@ -106,8 +101,22 @@ public class FullScreenDevice {
                 }
             }
         }
+        
+        dumpResolutionInfo(device);
         throw new RuntimeException("Could not set fullscreen resolution.");
     }
+
+	private static void dumpResolutionInfo(final GraphicsDevice device) {
+		final DisplayMode[] modes = device.getDisplayModes();
+        System.out.println("Available game resolutions:");
+        for (int x = 0; x < BEST_DISPLAY_MODES.length; x++) {
+        	System.out.println("Available resolution: [w: "+BEST_DISPLAY_MODES[x].getWidth()+" h: "+BEST_DISPLAY_MODES[x].getHeight()+" b:"+BEST_DISPLAY_MODES[x].getBitDepth()+"]");
+        }
+        System.out.println("Available resolutions on your system:");
+        for (int i = 0; i < modes.length; i++) {
+        	System.out.println("Available resolution: [w: "+modes[i].getWidth()+" h: "+modes[i].getHeight()+" b:"+modes[i].getBitDepth()+"]");
+        }
+	}
     
     public void restoreScreen() {
         final Window window = device.getFullScreenWindow();
