@@ -3,7 +3,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfigTemplate;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -25,6 +24,7 @@ public class FullScreenDevice {
 	private static int width; 
     
     private static final Dimension[] AVAILABLE_RESOLUTIONS = new Dimension[]{
+    		new Dimension(1280,1024),
     		new Dimension(1280,800),
     		new Dimension(1440,900),
     		new Dimension(800,600)
@@ -51,7 +51,7 @@ public class FullScreenDevice {
         mainFrame.setIgnoreRepaint(true);
         //if(controller.getMouseListener() == null) throw new IllegalArgumentException("MouseListener nï¿½o pode ser null");
         //mainFrame.addMouseListener(controller.getMouseListener());
-        if(controller.getKeyListener() == null) throw new IllegalArgumentException("KeyListener nï¿½o pode ser null");
+        if(controller.getKeyListener() == null) throw new IllegalArgumentException("KeyListener não pode ser null");
         mainFrame.addKeyListener(controller.getKeyListener());
         device.setFullScreenWindow(mainFrame);
         if (device.isDisplayChangeSupported()) {
@@ -80,58 +80,67 @@ public class FullScreenDevice {
     }
     
 	private static void dumpResolutionInfo(final GraphicsDevice device) {
-		final DisplayMode[] modes = device.getDisplayModes();
 		System.out.println("Available game resolutions:");
 		for (final Dimension resolution : AVAILABLE_RESOLUTIONS) {
 			System.out.println("width: "+resolution.width+" height "+resolution.height);
 		}
 		
+		final DisplayMode[] modes = device.getDisplayModes();
 		System.out.println("Available resolutions on your system:");
-		for (int i = 0; i < modes.length; i++) {
-			System.out.println("Available resolution: [width: "+ modes[i].getWidth() + " height: " + modes[i].getHeight()+ " bitDepth: " + modes[i].getBitDepth() + " refreshRate: "+modes[i].getRefreshRate()+"]");
+		for (DisplayMode displayMode : modes) {
+			System.out.println("Available resolution: [width: "+ displayMode.getWidth() + " height: " + displayMode.getHeight()+ " bitDepth: " + displayMode.getBitDepth() + " refreshRate: "+displayMode.getRefreshRate()+"]");
 		}
 	}
     
     private static void chooseBestDisplayMode(final GraphicsDevice device) {
-    	final GraphicsConfiguration bestConfiguration = device.getBestConfiguration(new GraphicsConfigTemplate() {
-			@Override
-			public boolean isGraphicsConfigSupported(final GraphicsConfiguration gc) {return true;}
-			
-			@Override
-			public GraphicsConfiguration getBestConfiguration(final GraphicsConfiguration[] gc) {
-				for (final GraphicsConfiguration graphicsConfiguration : gc) {
-					if(isGCValid(graphicsConfiguration)){
-						return graphicsConfiguration;
-					}
-				}
-				return null;
-			}
-
-			private boolean isGCValid(final GraphicsConfiguration graphicsConfiguration) {
-				for (final Dimension resolution : AVAILABLE_RESOLUTIONS) {
-					if(graphicsConfiguration.getBounds().getSize().equals(resolution)){
-						return true;
-					}
-		        }
-				return false;
-			}
-		});
-    	
-    	if(bestConfiguration == null){
+		DisplayMode bestDisplayMode = getBestDisplayModeForDeviceOrNull(device);
+		
+    	if(bestDisplayMode == null){
     		dumpResolutionInfo(device);
     		throw new RuntimeException("Could not set fullscreen");
     	}
     	
-    	final GraphicsDevice bestConfigDevice = bestConfiguration.getDevice();
-		final DisplayMode displayMode = bestConfigDevice.getDisplayMode();
-    	if (displayMode != null) {
-    		device.setDisplayMode(displayMode);
-    		width = displayMode.getWidth();
-    		height = displayMode.getHeight();
-    	}
+		setDisplayModeOnDevice(bestDisplayMode, device);
     }
+
+	private static DisplayMode getBestDisplayModeForDeviceOrNull(final GraphicsDevice device) {
+		DisplayMode bestDisplayMode = null;
+		final DisplayMode[] modes = device.getDisplayModes();
+		for (DisplayMode displayMode : modes) {
+			for (final Dimension availableResolution : AVAILABLE_RESOLUTIONS) {
+				final Dimension displayModeResolution = new Dimension(displayMode.getWidth(),displayMode.getHeight());
+				final boolean displayModeIsCompatible = displayModeResolution.equals(availableResolution);
+				if(displayModeIsCompatible){
+					bestDisplayMode = getBestDisplayMode(bestDisplayMode,displayMode);
+				}
+			}
+		}
+		return bestDisplayMode;
+	}
+
+	private static void setDisplayModeOnDevice(DisplayMode bestDisplayMode,
+			final GraphicsDevice device) {
+		device.setDisplayMode(bestDisplayMode);
+		width = bestDisplayMode.getWidth();
+		height = bestDisplayMode.getHeight();
+	}
     
-    public void restoreScreen() {
+    private static DisplayMode getBestDisplayMode(DisplayMode oldDisplayMode, DisplayMode newDisplayMode) {
+		if(oldDisplayMode == null)
+			return newDisplayMode;
+		boolean newWidthIsBigger = oldDisplayMode.getWidth() <  newDisplayMode.getWidth();
+		if(newWidthIsBigger){
+			return newDisplayMode;
+		}
+		boolean newWidthIsTheSame = oldDisplayMode.getWidth() ==  newDisplayMode.getWidth();
+		if(newWidthIsTheSame){
+			if(oldDisplayMode.getBitDepth() <  newDisplayMode.getBitDepth())
+				return newDisplayMode;
+		}
+		return oldDisplayMode;
+	}
+
+	public void restoreScreen() {
         final Window window = device.getFullScreenWindow();
         if (window != null) {
             window.dispose();
