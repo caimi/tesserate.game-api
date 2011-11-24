@@ -93,7 +93,7 @@ public class FullScreenDevice {
     	final DisplayMode[] modes = device.getDisplayModes();
     	
     	for (int i = 0; i < modes.length; i++) {
-    		System.out.println("Available resolution: [w: "+modes[i].getWidth()+" h: "+modes[i].getHeight()+" b:"+modes[i].getBitDepth());
+    		System.out.println("Available resolution: [w: "+modes[i].getWidth()+" h: "+modes[i].getHeight()+" b:"+modes[i].getBitDepth()+"]");
     	}
     	
         for (int x = 0; x < BEST_DISPLAY_MODES.length; x++) {
