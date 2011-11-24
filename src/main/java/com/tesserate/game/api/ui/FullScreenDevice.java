@@ -1,7 +1,9 @@
 package com.tesserate.game.api.ui;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfigTemplate;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -22,12 +24,11 @@ public class FullScreenDevice {
 	private static int height; 
 	private static int width; 
 	
-    private static DisplayMode[] BEST_DISPLAY_MODES = new DisplayMode[] {
-    	new DisplayMode(1280, 800, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
-    	new DisplayMode(1440, 900, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
-    	new DisplayMode(800, 600, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
-        new DisplayMode(800, 600, 16, DisplayMode.REFRESH_RATE_UNKNOWN),
-        new DisplayMode(800, 600, 8, DisplayMode.REFRESH_RATE_UNKNOWN)
+    
+    private static final Dimension[] AVAILABLE_RESOLUTIONS = new Dimension[]{
+    		new Dimension(1280,800),
+    		new Dimension(1440,900),
+    		new Dimension(800,600)
     };
     
 	public FullScreenDevice(){
@@ -80,43 +81,37 @@ public class FullScreenDevice {
     }
     
     private static void chooseBestDisplayMode(final GraphicsDevice device) {
-    	final DisplayMode best = getBestDisplayMode(device);
-    	if (best != null) {
-    		device.setDisplayMode(best);
-    		width = best.getWidth();
-    		height = best.getHeight();
+    	final GraphicsConfiguration bestConfiguration = device.getBestConfiguration(new GraphicsConfigTemplate() {
+			@Override
+			public boolean isGraphicsConfigSupported(final GraphicsConfiguration gc) {
+				for (final Dimension resolution : AVAILABLE_RESOLUTIONS) {
+					if(gc.getBounds().getSize().equals(resolution)){
+						return true;
+					}
+		        }
+				return false;
+			}
+			
+			@Override
+			public GraphicsConfiguration getBestConfiguration(final GraphicsConfiguration[] gc) {
+				GraphicsConfiguration biggest = gc[0];
+				for (final GraphicsConfiguration graphicsConfiguration : gc) {
+					if(graphicsConfiguration.getBounds().width > biggest.getBounds().width){
+						biggest = graphicsConfiguration;
+					}
+				}
+				return biggest;
+			}
+		});
+    	
+    	
+    	final DisplayMode displayMode = bestConfiguration.getDevice().getDisplayMode();
+    	if (displayMode != null) {
+    		device.setDisplayMode(displayMode);
+    		width = displayMode.getWidth();
+    		height = displayMode.getHeight();
     	}
     }
-
-    private static DisplayMode getBestDisplayMode(final GraphicsDevice device) {
-    	
-        for (int x = 0; x < BEST_DISPLAY_MODES.length; x++) {
-        	final DisplayMode[] modes = device.getDisplayModes();
-            for (int i = 0; i < modes.length; i++) {
-                final boolean widthMatches = modes[i].getWidth() == BEST_DISPLAY_MODES[x].getWidth();
-				final boolean heightMatches = modes[i].getHeight() == BEST_DISPLAY_MODES[x].getHeight();
-				final boolean bitDepthMatches = modes[i].getBitDepth() == BEST_DISPLAY_MODES[x].getBitDepth();
-				if (widthMatches && heightMatches && bitDepthMatches) {
-                    return BEST_DISPLAY_MODES[x];
-                }
-            }
-        }
-        
-        dumpResolutionInfo(device);
-        throw new RuntimeException("Could not set fullscreen resolution.");
-    }
-
-	private static void dumpResolutionInfo(final GraphicsDevice device) {
-		final DisplayMode[] modes = device.getDisplayModes();
-        System.out.println("Available game resolutions:");
-        for (int x = 0; x < BEST_DISPLAY_MODES.length; x++) {
-        	System.out.println("Available resolution: [w: "+BEST_DISPLAY_MODES[x].getWidth()+" h: "+BEST_DISPLAY_MODES[x].getHeight()+" b:"+BEST_DISPLAY_MODES[x].getBitDepth()+"]");
-        }
-        System.out.println("Available resolutions on your system:");
-        for (int i = 0; i < modes.length; i++) {
-        	System.out.println("Available resolution: [w: "+modes[i].getWidth()+" h: "+modes[i].getHeight()+" b:"+modes[i].getBitDepth()+"]");
-        }
-	}
     
     public void restoreScreen() {
         final Window window = device.getFullScreenWindow();
