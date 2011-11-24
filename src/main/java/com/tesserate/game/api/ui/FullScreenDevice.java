@@ -23,7 +23,6 @@ public class FullScreenDevice {
 	private ControllerDevice controller;
 	private static int height; 
 	private static int width; 
-	
     
     private static final Dimension[] AVAILABLE_RESOLUTIONS = new Dimension[]{
     		new Dimension(1280,800),
@@ -80,32 +79,51 @@ public class FullScreenDevice {
     	return (Graphics2D)bufferStrategy.getDrawGraphics();
     }
     
+	private static void dumpResolutionInfo(final GraphicsDevice device) {
+		final DisplayMode[] modes = device.getDisplayModes();
+		System.out.println("Available game resolutions:");
+		for (final Dimension resolution : AVAILABLE_RESOLUTIONS) {
+			System.out.println("width: "+resolution.width+" height "+resolution.height);
+		}
+		
+		System.out.println("Available resolutions on your system:");
+		for (int i = 0; i < modes.length; i++) {
+			System.out.println("Available resolution: [width: "+ modes[i].getWidth() + " height: " + modes[i].getHeight()+ " bitDepth: " + modes[i].getBitDepth() + " refreshRate: "+modes[i].getRefreshRate()+"]");
+		}
+	}
+    
     private static void chooseBestDisplayMode(final GraphicsDevice device) {
     	final GraphicsConfiguration bestConfiguration = device.getBestConfiguration(new GraphicsConfigTemplate() {
 			@Override
-			public boolean isGraphicsConfigSupported(final GraphicsConfiguration gc) {
+			public boolean isGraphicsConfigSupported(final GraphicsConfiguration gc) {return true;}
+			
+			@Override
+			public GraphicsConfiguration getBestConfiguration(final GraphicsConfiguration[] gc) {
+				for (final GraphicsConfiguration graphicsConfiguration : gc) {
+					if(isGCValid(graphicsConfiguration)){
+						return graphicsConfiguration;
+					}
+				}
+				return null;
+			}
+
+			private boolean isGCValid(final GraphicsConfiguration graphicsConfiguration) {
 				for (final Dimension resolution : AVAILABLE_RESOLUTIONS) {
-					if(gc.getBounds().getSize().equals(resolution)){
+					if(graphicsConfiguration.getBounds().getSize().equals(resolution)){
 						return true;
 					}
 		        }
 				return false;
 			}
-			
-			@Override
-			public GraphicsConfiguration getBestConfiguration(final GraphicsConfiguration[] gc) {
-				GraphicsConfiguration biggest = gc[0];
-				for (final GraphicsConfiguration graphicsConfiguration : gc) {
-					if(graphicsConfiguration.getBounds().width > biggest.getBounds().width){
-						biggest = graphicsConfiguration;
-					}
-				}
-				return biggest;
-			}
 		});
     	
+    	if(bestConfiguration == null){
+    		dumpResolutionInfo(device);
+    		throw new RuntimeException("Could not set fullscreen");
+    	}
     	
-    	final DisplayMode displayMode = bestConfiguration.getDevice().getDisplayMode();
+    	final GraphicsDevice bestConfigDevice = bestConfiguration.getDevice();
+		final DisplayMode displayMode = bestConfigDevice.getDisplayMode();
     	if (displayMode != null) {
     		device.setDisplayMode(displayMode);
     		width = displayMode.getWidth();
