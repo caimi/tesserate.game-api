@@ -34,6 +34,10 @@ public abstract class GameCore implements Runnable {
 	public static boolean isPaused(){
 		return GameCore.paused;
 	}
+
+	public static boolean setPaused(boolean par){
+		return GameCore.paused = par;
+	}
 	
 	public static void initFullScreenMode(){
 		FullScreenDevice.getInstance().setController(ControllerDevice.getInstance());

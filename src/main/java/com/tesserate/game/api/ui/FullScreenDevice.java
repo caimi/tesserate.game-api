@@ -23,8 +23,9 @@ public class FullScreenDevice {
 	private static int width; 
 	
     private static DisplayMode[] BEST_DISPLAY_MODES = new DisplayMode[] {
+    	//new DisplayMode(1440, 900, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
+    	new DisplayMode(1280, 1024, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
     	new DisplayMode(1280, 800, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
-    	new DisplayMode(1440, 900, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
     	new DisplayMode(800, 600, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
         new DisplayMode(800, 600, 16, DisplayMode.REFRESH_RATE_UNKNOWN),
         new DisplayMode(800, 600, 8, DisplayMode.REFRESH_RATE_UNKNOWN)

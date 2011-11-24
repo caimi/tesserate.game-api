@@ -13,16 +13,21 @@ public class GraphicText extends GraphicsObjects {
 	private static final long serialVersionUID = 1203023930451741329L;
 	protected String msg="";
 	protected FontMetrics fm;
-	protected Font font;
+	protected Font font = new Font("tahoma", Font.PLAIN, 10);
 	protected Color color;
 	protected float alignment = LEFT_ALIGNMENT;
 	
 	public GraphicText() {
 		super();
 		//color = Color.BLACK;
-		font = new Font("tahoma", Font.PLAIN, 10);
 	}
 
+	public GraphicText(String msg, int x, int y){
+		this.msg = msg;
+		this.setVisible(true);
+		this.setPosition(x, y);
+	}
+	
 	public GraphicText(String msg, int x, int y, Font font, Color c) {
 		this.font = font;
 		this.color = c;
@@ -89,7 +94,15 @@ public class GraphicText extends GraphicsObjects {
 		return msg;
 	}
 
-	public void setMsg(String msg) {
+	public void setMsg(String msg ) {
 		this.msg = msg;
+	}
+	
+	public void setMsg(int msg ) {
+		this.msg = String.format("%d", msg);
+	}
+	
+	public void setMsg(double msg ) {
+		this.msg = String.format("%d", msg);
 	}
 }
