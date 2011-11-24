@@ -93,7 +93,10 @@ public class FullScreenDevice {
         for (int x = 0; x < BEST_DISPLAY_MODES.length; x++) {
         	final DisplayMode[] modes = device.getDisplayModes();
             for (int i = 0; i < modes.length; i++) {
-				if (modes[i].equals(BEST_DISPLAY_MODES[x])) {
+                final boolean widthMatches = modes[i].getWidth() == BEST_DISPLAY_MODES[x].getWidth();
+				final boolean heightMatches = modes[i].getHeight() == BEST_DISPLAY_MODES[x].getHeight();
+				final boolean bitDepthMatches = modes[i].getBitDepth() == BEST_DISPLAY_MODES[x].getBitDepth();
+				if (widthMatches && heightMatches && bitDepthMatches) {
                     return BEST_DISPLAY_MODES[x];
                 }
             }
