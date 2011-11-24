@@ -43,15 +43,15 @@ public class FullScreenDevice {
 	
     
     public void init(){
-    	GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    	final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     	device = env.getDefaultScreenDevice();
-        GraphicsConfiguration gc = device.getDefaultConfiguration();
+        final GraphicsConfiguration gc = device.getDefaultConfiguration();
         mainFrame = new JFrame(gc);
         mainFrame.setUndecorated(true);
         mainFrame.setIgnoreRepaint(true);
-        //if(controller.getMouseListener() == null) throw new IllegalArgumentException("MouseListener não pode ser null");
+        //if(controller.getMouseListener() == null) throw new IllegalArgumentException("MouseListener nï¿½o pode ser null");
         //mainFrame.addMouseListener(controller.getMouseListener());
-        if(controller.getKeyListener() == null) throw new IllegalArgumentException("KeyListener não pode ser null");
+        if(controller.getKeyListener() == null) throw new IllegalArgumentException("KeyListener nï¿½o pode ser null");
         mainFrame.addKeyListener(controller.getKeyListener());
         device.setFullScreenWindow(mainFrame);
         if (device.isDisplayChangeSupported()) {
@@ -62,7 +62,7 @@ public class FullScreenDevice {
     }
     
     public void render(){
-		Graphics2D g = this.getGraphics();
+		final Graphics2D g = this.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(new Color(255,94,55));
@@ -79,8 +79,8 @@ public class FullScreenDevice {
     	return (Graphics2D)bufferStrategy.getDrawGraphics();
     }
     
-    private static void chooseBestDisplayMode(GraphicsDevice device) {
-    	DisplayMode best = getBestDisplayMode(device);
+    private static void chooseBestDisplayMode(final GraphicsDevice device) {
+    	final DisplayMode best = getBestDisplayMode(device);
     	if (best != null) {
     		device.setDisplayMode(best);
     		width = best.getWidth();
@@ -88,9 +88,9 @@ public class FullScreenDevice {
     	}
     }
 
-    private static DisplayMode getBestDisplayMode(GraphicsDevice device) {
+    private static DisplayMode getBestDisplayMode(final GraphicsDevice device) {
         for (int x = 0; x < BEST_DISPLAY_MODES.length; x++) {
-            DisplayMode[] modes = device.getDisplayModes();
+            final DisplayMode[] modes = device.getDisplayModes();
             for (int i = 0; i < modes.length; i++) {
                 if (modes[i].getWidth() == BEST_DISPLAY_MODES[x].getWidth()
                    && modes[i].getHeight() == BEST_DISPLAY_MODES[x].getHeight()
@@ -100,11 +100,11 @@ public class FullScreenDevice {
                 }
             }
         }
-        return null;
+        throw new RuntimeException("Could not set fullscreen resolution.");
     }
     
     public void restoreScreen() {
-        Window window = device.getFullScreenWindow();
+        final Window window = device.getFullScreenWindow();
         if (window != null) {
             window.dispose();
         }
@@ -113,7 +113,7 @@ public class FullScreenDevice {
     }
 
 
-	public void setController(ControllerDevice controller) {
+	public void setController(final ControllerDevice controller) {
 		this.controller = controller;
 	}
 
@@ -125,7 +125,7 @@ public class FullScreenDevice {
 		return mainFrame;
 	}
 
-	public void setMainFrame(JFrame mainFrame) {
+	public void setMainFrame(final JFrame mainFrame) {
 		this.mainFrame = mainFrame;
 	}
 
