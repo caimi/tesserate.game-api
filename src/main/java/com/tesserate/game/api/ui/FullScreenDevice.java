@@ -1,7 +1,9 @@
 package com.tesserate.game.api.ui;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfigTemplate;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -21,14 +23,11 @@ public class FullScreenDevice {
 	private ControllerDevice controller;
 	private static int height; 
 	private static int width; 
-	
-    private static DisplayMode[] BEST_DISPLAY_MODES = new DisplayMode[] {
-    	//new DisplayMode(1440, 900, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
-    	new DisplayMode(1280, 1024, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
-    	new DisplayMode(1280, 800, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
-    	new DisplayMode(800, 600, 32, DisplayMode.REFRESH_RATE_UNKNOWN),
-        new DisplayMode(800, 600, 16, DisplayMode.REFRESH_RATE_UNKNOWN),
-        new DisplayMode(800, 600, 8, DisplayMode.REFRESH_RATE_UNKNOWN)
+    
+    private static final Dimension[] AVAILABLE_RESOLUTIONS = new Dimension[]{
+    		new Dimension(1280,800),
+    		new Dimension(1440,900),
+    		new Dimension(800,600)
     };
     
 	public FullScreenDevice(){
@@ -44,15 +43,15 @@ public class FullScreenDevice {
 	
     
     public void init(){
-    	GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    	final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     	device = env.getDefaultScreenDevice();
-        GraphicsConfiguration gc = device.getDefaultConfiguration();
+        final GraphicsConfiguration gc = device.getDefaultConfiguration();
         mainFrame = new JFrame(gc);
         mainFrame.setUndecorated(true);
         mainFrame.setIgnoreRepaint(true);
-        //if(controller.getMouseListener() == null) throw new IllegalArgumentException("MouseListener não pode ser null");
+        //if(controller.getMouseListener() == null) throw new IllegalArgumentException("MouseListener nï¿½o pode ser null");
         //mainFrame.addMouseListener(controller.getMouseListener());
-        if(controller.getKeyListener() == null) throw new IllegalArgumentException("KeyListener não pode ser null");
+        if(controller.getKeyListener() == null) throw new IllegalArgumentException("KeyListener nï¿½o pode ser null");
         mainFrame.addKeyListener(controller.getKeyListener());
         device.setFullScreenWindow(mainFrame);
         if (device.isDisplayChangeSupported()) {
@@ -63,7 +62,7 @@ public class FullScreenDevice {
     }
     
     public void render(){
-		Graphics2D g = this.getGraphics();
+		final Graphics2D g = this.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.setColor(new Color(255,94,55));
@@ -80,32 +79,60 @@ public class FullScreenDevice {
     	return (Graphics2D)bufferStrategy.getDrawGraphics();
     }
     
-    private static void chooseBestDisplayMode(GraphicsDevice device) {
-    	DisplayMode best = getBestDisplayMode(device);
-    	if (best != null) {
-    		device.setDisplayMode(best);
-    		width = best.getWidth();
-    		height = best.getHeight();
-    	}
-    }
+	private static void dumpResolutionInfo(final GraphicsDevice device) {
+		final DisplayMode[] modes = device.getDisplayModes();
+		System.out.println("Available game resolutions:");
+		for (final Dimension resolution : AVAILABLE_RESOLUTIONS) {
+			System.out.println("width: "+resolution.width+" height "+resolution.height);
+		}
+		
+		System.out.println("Available resolutions on your system:");
+		for (int i = 0; i < modes.length; i++) {
+			System.out.println("Available resolution: [width: "+ modes[i].getWidth() + " height: " + modes[i].getHeight()+ " bitDepth: " + modes[i].getBitDepth() + " refreshRate: "+modes[i].getRefreshRate()+"]");
+		}
+	}
+    
+    private static void chooseBestDisplayMode(final GraphicsDevice device) {
+    	final GraphicsConfiguration bestConfiguration = device.getBestConfiguration(new GraphicsConfigTemplate() {
+			@Override
+			public boolean isGraphicsConfigSupported(final GraphicsConfiguration gc) {return true;}
+			
+			@Override
+			public GraphicsConfiguration getBestConfiguration(final GraphicsConfiguration[] gc) {
+				for (final GraphicsConfiguration graphicsConfiguration : gc) {
+					if(isGCValid(graphicsConfiguration)){
+						return graphicsConfiguration;
+					}
+				}
+				return null;
+			}
 
-    private static DisplayMode getBestDisplayMode(GraphicsDevice device) {
-        for (int x = 0; x < BEST_DISPLAY_MODES.length; x++) {
-            DisplayMode[] modes = device.getDisplayModes();
-            for (int i = 0; i < modes.length; i++) {
-                if (modes[i].getWidth() == BEST_DISPLAY_MODES[x].getWidth()
-                   && modes[i].getHeight() == BEST_DISPLAY_MODES[x].getHeight()
-                   && modes[i].getBitDepth() == BEST_DISPLAY_MODES[x].getBitDepth()
-                   ) {
-                    return BEST_DISPLAY_MODES[x];
-                }
-            }
-        }
-        return null;
+			private boolean isGCValid(final GraphicsConfiguration graphicsConfiguration) {
+				for (final Dimension resolution : AVAILABLE_RESOLUTIONS) {
+					if(graphicsConfiguration.getBounds().getSize().equals(resolution)){
+						return true;
+					}
+		        }
+				return false;
+			}
+		});
+    	
+    	if(bestConfiguration == null){
+    		dumpResolutionInfo(device);
+    		throw new RuntimeException("Could not set fullscreen");
+    	}
+    	
+    	final GraphicsDevice bestConfigDevice = bestConfiguration.getDevice();
+		final DisplayMode displayMode = bestConfigDevice.getDisplayMode();
+    	if (displayMode != null) {
+    		device.setDisplayMode(displayMode);
+    		width = displayMode.getWidth();
+    		height = displayMode.getHeight();
+    	}
     }
     
     public void restoreScreen() {
-        Window window = device.getFullScreenWindow();
+        final Window window = device.getFullScreenWindow();
         if (window != null) {
             window.dispose();
         }
@@ -114,7 +141,7 @@ public class FullScreenDevice {
     }
 
 
-	public void setController(ControllerDevice controller) {
+	public void setController(final ControllerDevice controller) {
 		this.controller = controller;
 	}
 
@@ -126,7 +153,7 @@ public class FullScreenDevice {
 		return mainFrame;
 	}
 
-	public void setMainFrame(JFrame mainFrame) {
+	public void setMainFrame(final JFrame mainFrame) {
 		this.mainFrame = mainFrame;
 	}
 
