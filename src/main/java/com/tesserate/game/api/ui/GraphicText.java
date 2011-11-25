@@ -38,11 +38,12 @@ public class GraphicText extends GraphicsObjects {
 	
 	protected void redefineBonds(Graphics g) {
 		fm = g.getFontMetrics(font);
-		int width = fm.stringWidth(
-				this.msg);
+		int width = fm.stringWidth(	this.msg);
 		int height = (int)(fm.getHeight() * 0.65);
 		if (alignment == RIGHT_ALIGNMENT){
 			this.setBounds(this.getLocation().x-width, this.getLocation().y-height, width, height);
+		}else if(alignment == CENTER_ALIGNMENT){
+			this.setBounds(this.getLocation().x-width/2, this.getLocation().y-height/2, width, height);
 		}else{
 			this.setBounds(this.getLocation().x, this.getLocation().y-height, width, height);
 		}
@@ -85,6 +86,8 @@ public class GraphicText extends GraphicsObjects {
 		g.setColor(color);
 		if ( alignment == RIGHT_ALIGNMENT){
 			g.drawString(msg, this.getLocation().x-fm.stringWidth(msg), this.getLocation().y);
+		}else if(alignment == CENTER_ALIGNMENT){
+			g.drawString(msg, this.getLocation().x-fm.stringWidth(msg)/2, this.getLocation().y);
 		}else{
 			g.drawString(msg, this.getLocation().x, this.getLocation().y);
 		}
