@@ -8,4 +8,5 @@ public class Util {
 	public static int rnd(int min, int max){
 		return (int) Math.rint(Math.random()*(max-min))+min;
 	}
+
 }

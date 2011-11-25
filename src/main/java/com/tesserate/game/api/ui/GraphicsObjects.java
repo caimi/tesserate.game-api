@@ -36,4 +36,5 @@ public abstract class GraphicsObjects extends JPanel implements Renderable{
 	public void setPosition(Vector2D v) {
 		this.setPosition(v.getX(), v.getY());
 	}
+	
 }

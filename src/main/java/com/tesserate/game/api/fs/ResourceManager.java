@@ -1,5 +1,6 @@
 package com.tesserate.game.api.fs;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -25,8 +26,13 @@ public class ResourceManager {
 		return (Sound)resourcesLoaded.get(id);
 	}
 	
+	public static List<String> getTextFiles(String id){
+		return ((TextFileResource) resourcesLoaded.get(id)).getLineFile();
+	}
+
 	public static void removeResource(String id){
 		resourcesLoaded.remove(id);
 	}
+	
 	
 }

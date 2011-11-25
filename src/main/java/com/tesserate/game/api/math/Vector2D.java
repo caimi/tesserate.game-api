@@ -68,4 +68,8 @@ public class Vector2D {
 		this.y = y;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("(%f, %f)", x,y);
+	}
 }
