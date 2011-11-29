@@ -2,6 +2,7 @@ package com.tesserate.game.api.fs;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
@@ -24,9 +25,14 @@ public class ImageResource extends Resource {
 	public static BufferedImage loadImage(String filename){
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(loadFile(filename));
-		} catch (IOException e) {
-			System.err.println("Arquivo não encontrado: " + filename);
+			InputStream is = loadFile(filename);
+			if(is == null){ 
+				throw new IOException("File not found.");
+			};
+			image = ImageIO.read(is);
+		} catch (Exception e) {
+			System.err.println("File not found: " + filename);
+			System.exit(0);
 		}
 			
 		return image;

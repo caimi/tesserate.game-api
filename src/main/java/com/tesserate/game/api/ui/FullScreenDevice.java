@@ -24,6 +24,7 @@ public class FullScreenDevice {
 	private static int width; 
     
     private static final Dimension[] AVAILABLE_RESOLUTIONS = new Dimension[]{
+	    	new Dimension(1024, 768),
     		new Dimension(1280,1024),
     		new Dimension(1280,800),
     		new Dimension(1440,900),
