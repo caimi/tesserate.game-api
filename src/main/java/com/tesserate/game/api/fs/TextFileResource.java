@@ -24,7 +24,7 @@ public class TextFileResource extends Resource {
 		    }
 		    in.close();
 		} catch (IOException e) {
-			System.err.println("Arquivo não encontrado: " + filename);
+			System.err.println("Oops, arquivo não encontrado: " + filename);
 			System.exit(0);
 		}
 	}
